@@ -46,11 +46,12 @@ form.addEventListener("submit", (evento) => {
         
         atualizaElemento(itemAtual)
 
-        itens[existe.id] = itemAtual
+        //busca o elemento
+        itens[itens.findIndex(elemento => elemento.id == existe.id)] = itemAtual
         // para atualizar o localStorage apenas atualiza o array
         // pq o localStorage sempre é reescrito
     }else{
-        itemAtual.id = itens.length
+        itemAtual.id = itens[itens.length -1] ? (itens[itens.length-1]).id +1 : 0;
          //vai receber o Objeto pronto
         criaElemento(itemAtual)
 
@@ -90,13 +91,38 @@ function criaElemento(item) {
     // coloca o texto do input nome no innerhtml que vai depois da tag Strong
     novoItem.innerHTML += item.nome
 
+    // botao de deletar
+    novoItem.appendChild(botaoDeleta(item.id))
     // coloca o item da lista feita, dentro da lista
     lista.appendChild(novoItem)
-
-
-   
+  
 }
 
 function atualizaElemento(item) {
     document.querySelector("[data-id='"+item.id+"']").innerHTML = item.quantidade
+}
+
+function botaoDeleta (id) {
+    const elementoBotao = document.createElement('button')
+    elementoBotao.innerText = "X"
+    console.log(id)
+
+    //quando o botão é criado dinamicamente precisamos criar o elemento associado
+    elementoBotao.addEventListener("click", function() {
+        //nessa função não foi possivel usar arrow funciton pois ela não carrega o elemento this, então precisamos declarar a function mesmo
+        deletaElemento(this.parentNode, id)
+        //o elemento pai
+    })
+
+    return elementoBotao
+}
+
+function deletaElemento(tag, id) {
+    tag.remove()
+    //remover do array itens
+    itens.splice(itens.findIndex(elemento => elemento.id == id), 1)
+
+    console.log(itens)
+    // reescrever o local storage
+    localStorage.setItem("itens", JSON.stringify(itens))
 }
